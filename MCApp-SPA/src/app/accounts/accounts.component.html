@@ -1,0 +1,11 @@
+<br>
+<div class="text-right">
+  <button class="btn btn-primary btn-lg mr-2" (click)="newAccount(user.id)">New Account</button>
+</div>
+<br>
+<div class="row equal">
+  <div *ngFor="let account of user.accounts"  class="col-lg-2 col-md-3 col-sm-6">
+    <app-account-card [account]="account"></app-account-card>
+    <!-- <li>{{account.accountname}}  --  {{ account.balance }} tegen een percentage van {{ account.percentage }}</li> -->
+  </div>
+</div>>

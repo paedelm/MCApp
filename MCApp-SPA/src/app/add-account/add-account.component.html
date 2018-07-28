@@ -1,0 +1,27 @@
+<form [formGroup]="addAccountForm" (ngSubmit)="addAccount()">
+
+  <h2 class="text-center text-primary">Add Account</h2>
+
+  <hr>
+  <div class="form-group" [ngClass]="{'has-error': addAccountForm.get('accountname').errors &&  addAccountForm.get('accountname').touched}">
+    <input type="text" class="form-control" placeholder="accountname" formControlName="accountname">
+    <span class="help-block" *ngIf="addAccountForm.get('accountname').hasError('required')  &&  addAccountForm.get('accountname').touched">
+      Accountname is required
+    </span>
+  </div>
+
+  <div class="form-group" [ngClass]="{'has-error': addAccountForm.get('description').touched && addAccountForm.get('description').hasError('required')}">
+    <input class="form-control" placeholder="Description" formControlName="description">
+    <span class="help-block" *ngIf="addAccountForm.get('description').touched && addAccountForm.get('description').hasError('required')">Description is required</span>
+  </div>
+
+  <div class="form-group" [ngClass]="{'has-error': addAccountForm.get('percentage').touched && addAccountForm.get('percentage').hasError('required')}">
+    <input type="number" step="0.01" min="0" max="15" class="form-control" placeholder="Percentage" formControlName="percentage">
+    <span class="help-block" *ngIf="addAccountForm.get('percentage').touched && addAccountForm.get('percentage').hasError('required')">percentage is required</span>
+  </div>
+
+  <div class="form-group text-center">
+    <button class="btn btn-success" [disabled]="!addAccountForm.valid" type="submit">AddAccount</button>
+    <button class="btn btn-default" type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>

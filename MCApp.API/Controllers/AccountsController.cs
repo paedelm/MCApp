@@ -58,7 +58,7 @@ namespace MCApp.API.Controllers
             var user = await _repo.GetUser(userId);
 
             var account = await _repo.GetAccount(id);
-            if (account == null) return NotFound();
+            if (account == null || account.UserId != userId) return Unauthorized();
 
             var lastMutation = await _repo.GetMutation(account.LastMutationCreated, userId, id);
             if (lastMutation != null) {
@@ -67,6 +67,17 @@ namespace MCApp.API.Controllers
             }
             var accountToReturn = _map.Map<AccountForDetailedDto>(account);
             return Ok(accountToReturn);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAccounts(int userId) {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (currentUserId != userId) return Unauthorized();
+
+            var user = await _repo.GetUser(userId);
+            
+            var userToReturn = _map.Map<UserWithAccountsDto>(user);
+            return Ok(userToReturn);
         }
     }
 }

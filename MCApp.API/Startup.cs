@@ -92,10 +92,12 @@ namespace MCApp.API
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc(routes => {
+            if (env.IsDevelopment()) {
                 routes.MapSpaFallbackRoute(
                     name: "spa.fallback",
                     defaults: new { controller = "Fallback", action = "Index"}
                 );
+            }
             });
         }
     }

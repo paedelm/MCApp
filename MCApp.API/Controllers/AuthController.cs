@@ -67,7 +67,7 @@ namespace MCApp.API.Controllers
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            var user = _map.Map<UserForListDto>(userFromRepo);
+            var user = _map.Map<UserForDetailedDto>(userFromRepo);
             return Ok(new { tokenString, user });
         }
     }

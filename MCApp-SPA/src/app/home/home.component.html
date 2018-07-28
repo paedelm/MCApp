@@ -1,0 +1,31 @@
+  <!-- home page html -->
+
+  <div *ngIf="!registerMode && !authService.loggedIn()" class="text-center">
+    <h1>Register yourself</h1>
+    <p class="lead">Come on in to using MicroCredits... All you need to do is sign up!</p>
+    <div class="text-center">
+      <button class="btn btn-primary btn-lg" (click)="registerToggle()">Register</button>
+      <button class="btn btn-info btn-lg">Learn More</button>
+    </div>
+  </div>
+
+  <div *ngIf="!registerMode && authService.loggedIn()" class="text-center">
+    <h1>Create a new account</h1>
+    <p class="lead">Come on in using different accounts... All you need to do is create one!</p>
+    <div class="text-center">
+      <button class="btn btn-primary btn-lg" (click)="registerToggle()">NewAccount</button>
+      <button class="btn btn-info btn-lg">Learn More</button>
+    </div>
+  </div>
+
+  <div *ngIf="registerMode  && !authService.loggedIn()" class="container">
+    <div class="col-md-4 col-md-offset-4">
+      <app-register (cancelRegister)="cancelRegisterMode($event)"></app-register>
+    </div>
+  </div>
+
+  <div *ngIf="registerMode  && authService.loggedIn()" class="container">
+    <div class="col-md-4 col-md-offset-4">
+      <app-add-account (cancelAddAccount)="cancelAddAccountMode($event)"></app-add-account>
+    </div>
+  </div>

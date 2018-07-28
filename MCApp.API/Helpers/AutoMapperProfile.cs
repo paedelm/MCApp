@@ -24,6 +24,8 @@ namespace MCApp.API.Helpers
 
             CreateMap<Interest, InterestForDetailedDto>();
             CreateMap<InterestForCreationDto, Interest>();
+
+            CreateMap<User, UserWithAccountsDto>();
         }
     }
 }

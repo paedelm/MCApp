@@ -1,0 +1,20 @@
+<form [formGroup]="addMutationForm" (ngSubmit)="addMutation()">
+
+  <h2 class="text-center text-primary">Add Mutation</h2>
+
+  <hr>
+  <div class="form-group" [ngClass]="{'has-error': addMutationForm.get('description').touched && addMutationForm.get('description').hasError('required')}">
+    <input class="form-control" placeholder="Description" formControlName="description">
+    <span class="help-block" *ngIf="addMutationForm.get('description').touched && addMutationForm.get('description').hasError('required')">Description is required</span>
+  </div>
+
+  <div class="form-group" [ngClass]="{'has-error': addMutationForm.get('amount').touched && addMutationForm.get('amount').hasError('required')}">
+    <input type="number" step="0.01" min="0" max="15" class="form-control" placeholder="Amount" formControlName="amount">
+    <span class="help-block" *ngIf="addMutationForm.get('amount').touched && addMutationForm.get('amount').hasError('required')">Amount is required</span>
+  </div>
+
+  <div class="form-group text-center">
+    <button class="btn btn-success" [disabled]="!addMutationForm.valid" type="submit">AddMutation</button>
+    <button class="btn btn-default" type="button" (click)="cancel()">Cancel</button>
+  </div>
+</form>

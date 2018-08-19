@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MCApp.API.Migrations
 {
-    public partial class sqlserverazure : Migration
+    public partial class azurebob : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

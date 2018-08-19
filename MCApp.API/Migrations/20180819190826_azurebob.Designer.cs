@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MCApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20180818165019_sqlserverazure")]
-    partial class sqlserverazure
+    [Migration("20180819190826_azurebob")]
+    partial class azurebob
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

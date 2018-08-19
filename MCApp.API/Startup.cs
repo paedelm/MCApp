@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -36,26 +37,31 @@ namespace MCApp.API
         {
             var key = System.Text.Encoding.ASCII.GetBytes(Configuration.GetSection("AppSettings:token").Value);
             services.AddDbContext<DataContext>(x => x
-                .UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+                .UseSqlServer(Configuration.GetConnectionString("MCConnection"))
+                // .UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
                 .ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.IncludeIgnoredWarning)));
-            services.AddMvc( config => {
+            services.AddMvc(config =>
+            {
                 config.RespectBrowserAcceptHeader = true;
-                config.InputFormatters.Add(new XmlSerializerInputFormatter());
+                config.InputFormatters.Add(new XmlSerializerInputFormatter(config));
                 config.OutputFormatters.Add(new XmlSerializerOutputFormatter());
             }
-            ).AddJsonOptions(opt => 
+            ).AddJsonOptions(opt =>
             {
                 opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-            });
-            
+            }
+            ).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             // services.AddTransient<Seed>();
+            services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
             services.AddCors();
             // services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper();
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IMicroCreditRepository, MicroCreditRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => {
+                .AddJwtBearer(options =>
+                {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
@@ -73,12 +79,17 @@ namespace MCApp.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            } else {
-                app.UseExceptionHandler(builder => {
-                    builder.Run(async context => {
+            }
+            else
+            {
+                app.UseExceptionHandler(builder =>
+                {
+                    builder.Run(async context =>
+                    {
                         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         var error = context.Features.Get<IExceptionHandlerFeature>();
-                        if (error != null) {
+                        if (error != null)
+                        {
                             context.Response.AddApplicationError(error.Error.Message);
                             await context.Response.WriteAsync(error.Error.Message);
                         }
@@ -91,13 +102,15 @@ namespace MCApp.API
             app.UseAuthentication();
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.UseMvc(routes => {
-            if (env.IsDevelopment()) {
-                routes.MapSpaFallbackRoute(
-                    name: "spa.fallback",
-                    defaults: new { controller = "Fallback", action = "Index"}
-                );
-            }
+            app.UseMvc(routes =>
+            {
+                if (env.IsDevelopment())
+                {
+                    routes.MapSpaFallbackRoute(
+                        name: "spa.fallback",
+                        defaults: new { controller = "Fallback", action = "Index" }
+                    );
+                }
             });
         }
     }

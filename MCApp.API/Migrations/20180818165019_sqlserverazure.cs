@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MCApp.API.Migrations
 {
-    public partial class initialdb : Migration
+    public partial class sqlserverazure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,16 +13,16 @@ namespace MCApp.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    City = table.Column<string>(nullable: true),
-                    Country = table.Column<string>(nullable: true),
-                    Created = table.Column<DateTime>(nullable: false),
-                    DateOfBirth = table.Column<DateTime>(nullable: false),
-                    KnownAs = table.Column<string>(nullable: true),
-                    LastActive = table.Column<DateTime>(nullable: false),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Username = table.Column<string>(nullable: false),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true),
-                    Username = table.Column<string>(nullable: false)
+                    DateOfBirth = table.Column<DateTime>(nullable: false),
+                    KnownAs = table.Column<string>(nullable: true),
+                    Created = table.Column<DateTime>(nullable: false),
+                    LastActive = table.Column<DateTime>(nullable: false),
+                    City = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -35,18 +35,18 @@ namespace MCApp.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Accountname = table.Column<string>(nullable: true),
-                    Balance = table.Column<double>(nullable: false),
-                    CalculatedInterest = table.Column<double>(nullable: false),
-                    Created = table.Column<DateTime>(nullable: false),
                     Description = table.Column<string>(nullable: true),
+                    Created = table.Column<DateTime>(nullable: false),
+                    LastInterestMutation = table.Column<DateTime>(nullable: false),
                     InterestPeriod = table.Column<string>(nullable: true),
                     LastActive = table.Column<DateTime>(nullable: false),
-                    LastInterestMutation = table.Column<DateTime>(nullable: false),
-                    LastMutationCreated = table.Column<DateTime>(nullable: false),
                     Percentage = table.Column<double>(nullable: false),
-                    UserId = table.Column<int>(nullable: false)
+                    CalculatedInterest = table.Column<double>(nullable: false),
+                    Balance = table.Column<double>(nullable: false),
+                    UserId = table.Column<int>(nullable: false),
+                    LastMutationCreated = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,7 +56,7 @@ namespace MCApp.API.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,12 +64,12 @@ namespace MCApp.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    AccountId = table.Column<int>(nullable: false),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Created = table.Column<DateTime>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
                     InterestDate = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
                     Percentage = table.Column<double>(nullable: false),
+                    AccountId = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -80,7 +80,7 @@ namespace MCApp.API.Migrations
                         column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Interests_Users_UserId",
                         column: x => x.UserId,
@@ -94,14 +94,14 @@ namespace MCApp.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    AccountId = table.Column<int>(nullable: false),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    PrevId = table.Column<int>(nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    InterestDate = table.Column<DateTime>(nullable: false),
                     Amount = table.Column<double>(nullable: false),
                     Balance = table.Column<double>(nullable: false),
-                    Created = table.Column<DateTime>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    InterestDate = table.Column<DateTime>(nullable: false),
-                    PrevId = table.Column<int>(nullable: false),
+                    AccountId = table.Column<int>(nullable: false),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -113,7 +113,7 @@ namespace MCApp.API.Migrations
                         column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Mutations_Users_UserId",
                         column: x => x.UserId,
@@ -133,9 +133,9 @@ namespace MCApp.API.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Interests_UserId",
+                name: "IX_Interests_UserId_AccountId",
                 table: "Interests",
-                column: "UserId");
+                columns: new[] { "UserId", "AccountId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mutations_AccountId",

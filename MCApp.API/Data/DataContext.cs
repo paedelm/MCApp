@@ -25,6 +25,26 @@ namespace MCApp.API.Data
                 
             builder.Entity<Mutation>()
                 .HasAlternateKey(m => m.PrevId);
+
+            builder.Entity<Interest>()
+                .HasIndex(r => new {r.UserId, r.AccountId});
+
+            builder.Entity<Account>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Accounts)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.Entity<Mutation>()
+                .HasOne(r => r.Account)
+                .WithMany(a => a.Mutations)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Interest>()
+                .HasOne(r => r.Account)
+                .WithMany(a => a.Interests)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
     

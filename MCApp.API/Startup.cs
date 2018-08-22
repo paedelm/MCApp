@@ -53,7 +53,7 @@ namespace MCApp.API
             ).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // services.AddTransient<Seed>();
-            services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
+            // services.BuildServiceProvider().GetService<DataContext>().Database.Migrate();
             services.AddCors();
             // services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
             services.AddAutoMapper();

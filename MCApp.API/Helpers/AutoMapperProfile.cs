@@ -20,6 +20,7 @@ namespace MCApp.API.Helpers
             CreateMap<AccountForCreationDto, Account>();
 
             CreateMap<Mutation, MutationForDetailedDto>();
+            CreateMap<Mutation, MutationForListDto>();
             CreateMap<MutationForCreationDto, Mutation>();
 
             CreateMap<Interest, InterestForDetailedDto>();

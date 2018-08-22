@@ -12,6 +12,7 @@ import { Account } from '../_models/Account';
 import { AccountForDetailed } from '../_models/AccountForDetailed';
 import { Mutation } from '../_models/Mutation';
 import { MutationForDetailed } from '../_models/MutationForDetailed';
+import { MutationForPage } from '../_models/MutationForPage';
 
 @Injectable()
 export class UserService {
@@ -73,6 +74,10 @@ export class UserService {
   getUser(id): Observable<User> {
     return this.authHttp.get<User>(this.baseUrl + 'users/' + id);
   }
+  getAccount(userId: number, account: Account): Observable<AccountForDetailed> {
+    return this.authHttp.get<AccountForDetailed>(
+      this.baseUrl + 'users/' + userId + '/accounts/' + account.id);
+  }
 
   addMutation(userId: number, account: Account, mutation: Mutation): Observable<MutationForDetailed> {
     mutation.accountname = account.accountname;
@@ -81,6 +86,10 @@ export class UserService {
       mutation);
   }
 
+  getMutations(userId: number, account: Account, page?:  number, itemsPerPage?: number): Observable<MutationForPage> {
+    return this.authHttp.get<MutationForPage>(
+      this.baseUrl + 'users/' + userId + '/accounts/' + account.id + '/mutations');
+  }
   updateUser(id: number, user: User) {
     return this.authHttp.put(this.baseUrl + 'users/' + id, user);
   }

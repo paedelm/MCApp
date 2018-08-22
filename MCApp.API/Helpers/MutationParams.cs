@@ -10,6 +10,8 @@ namespace MCApp.API.Helpers
             get { return pageSize;}
             set { pageSize = value > maxPageSize ? maxPageSize : value;}
         }
+        public int UserId { get; set; }
+        public int AccountId { get; set; }
         
     }
 }

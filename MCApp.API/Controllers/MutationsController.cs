@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -88,6 +89,26 @@ namespace MCApp.API.Controllers
 
             var mutationToReturn = _map.Map<MutationForDetailedDto>(mutation);
             return Ok(mutationToReturn);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetMutationsForUserAccount(int userId, int accountId, MutationParams mutationParams) {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            if (currentUserId != userId) return Unauthorized();
+
+            var account =  await _repo.GetAccount(accountId );       
+            if ( account == null  || account.UserId != userId) return Unauthorized();
+
+            var user = await _repo.GetUser(userId);
+
+            mutationParams.UserId = userId;
+            mutationParams.AccountId = accountId;
+
+            var pgMutationsFromRepo = await _repo.GetMutationsForUserAccount(mutationParams);
+            var accDisply = _map.Map<AccountForDetailedDto>(account);
+            var mutations = _map.Map<ICollection<MutationForListDto>>(pgMutationsFromRepo);
+            Response.AddPagination(pgMutationsFromRepo.CurrentPage, pgMutationsFromRepo.PageSize,
+                pgMutationsFromRepo.TotalCount, pgMutationsFromRepo.TotalPages);
+            return Ok(new MutationForPageDto { Account= accDisply, Mutations = mutations });
         }
         
     }

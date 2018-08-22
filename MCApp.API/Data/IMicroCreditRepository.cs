@@ -17,6 +17,7 @@ namespace MCApp.API.Data
          Task<Account> GetAccount(int userId, string name);
          Task<Mutation> GetMutation(int id);
          Task<Mutation> GetMutation(DateTime created, int userId, int accountId);
+         Task<PagedList<Mutation>> GetMutationsForUserAccount(MutationParams mutationParams);
          Task<Interest> GetInterest(int id);
          Task<PagedList<Mutation>> GetAccountMutationsForUser(int userId, int accountId, MutationParams mp);
         

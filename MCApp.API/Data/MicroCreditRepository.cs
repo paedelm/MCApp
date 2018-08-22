@@ -88,5 +88,15 @@ namespace MCApp.API.Data
         {
             return await _context.SaveChangesAsync()>0;
         }
+
+        public async Task<PagedList<Mutation>> GetMutationsForUserAccount(MutationParams mutationParams)
+        {
+            var mutations = _context.Mutations
+                .Where(m => m.UserId == mutationParams.UserId && m.AccountId == mutationParams.AccountId)
+                .AsQueryable();
+
+            var omutations = mutations.OrderByDescending(m => m.Id);
+            return await PagedList<Mutation>.CreateAsync(omutations, mutationParams.PageNumber, mutationParams.PageSize);
+        }
     }
 }

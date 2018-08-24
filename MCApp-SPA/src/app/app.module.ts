@@ -34,6 +34,8 @@ import { AccountsComponent } from './accounts/accounts.component';
 import { AccountCardComponent } from './account-card/account-card.component';
 import { AddAccountComponent } from './add-account/add-account.component';
 import { AddMutationComponent } from './add-mutation/add-mutation.component';
+import { MutationsComponent } from './mutations/mutations.component';
+import { MutationsResolver } from './_resolvers/mutations.resolver';
 
 export function getAccessToken(): string {
   return localStorage.getItem('token');
@@ -53,7 +55,8 @@ export function getAccessToken(): string {
       AccountCardComponent,
       AddAccountComponent,
       TimeAgoPipe,
-      AddMutationComponent
+      AddMutationComponent,
+      MutationsComponent
    ],
    imports: [
       BrowserModule,
@@ -85,6 +88,7 @@ export function getAccessToken(): string {
     MemberEditResolver,
     PreventUnsavedChanges,
     ListsResolver,
+    MutationsResolver,
     AccountListResolver,
     ErrorInterceptorProvider
   ],

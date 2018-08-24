@@ -75,7 +75,9 @@ export class AuthService {
         })
       );
   }
-
+  getCurrentUser(): UserWithAccounts {
+    return this.currentUser;
+  }
   register(user: User) {
     return this.http.post(this.baseUrl + 'register', user, {
       headers: new HttpHeaders().set('Content-Type', 'application/json')

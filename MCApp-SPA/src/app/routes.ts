@@ -13,6 +13,8 @@ import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
 import { ListsResolver } from './_resolvers/lists.resolver';
 import { AccountListResolver } from './_resolvers/account-list.resolver';
 import { AccountsComponent } from './accounts/accounts.component';
+import { MutationsResolver } from './_resolvers/mutations.resolver';
+import { MutationsComponent } from './mutations/mutations.component';
 // import { MessagesResolver } from './_resolvers/messages.resolver';
 
 export const appRoutes: Routes = [
@@ -23,8 +25,8 @@ export const appRoutes: Routes = [
             { path: 'accounts', component: AccountsComponent, resolve: {user: AccountListResolver} },
             { path: 'members/:id', component: MemberDetailComponent, resolve: {user: MemberDetailResolver} },
             { path: 'member/edit', component: MemberEditComponent, resolve: {user: MemberEditResolver},
-             canDeactivate: [PreventUnsavedChanges] }
-            // { path: 'messages', component: MessagesComponent, resolve: { messages: MessagesResolver} },
+             canDeactivate: [PreventUnsavedChanges] },
+            { path: 'mutations', component: MutationsComponent, resolve: { pgMutations: MutationsResolver} }
             // { path: 'lists', component: ListsComponent, resolve: {users: ListsResolver} }
         ]
     },

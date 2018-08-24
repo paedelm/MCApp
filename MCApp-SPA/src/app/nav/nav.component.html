@@ -6,12 +6,12 @@
       <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" [routerLink]="['/accounts']">Accounts</a>
       </li>
-      <li class="nav-item" routerLinkActive="active">
-        <a class="nav-link" [routerLink]="['/lists']">Mutations</a>
+      <li *ngIf="currentAccount()" class="nav-item" routerLinkActive="active">
+        <a class="nav-link" [routerLink]="['/mutations']">Mutations</a>
       </li>
-      <li class="nav-item" routerLinkActive="active">
+      <!-- <li class="nav-item" routerLinkActive="active">
         <a class="nav-link" [routerLink]="['/messages']">Interests</a>
-      </li>
+      </li> -->
     </ul>
 
     <div *ngIf="loggedIn()" class="dropdown" dropdown>

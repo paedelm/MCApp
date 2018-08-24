@@ -13,12 +13,22 @@ import { AccountForDetailed } from '../_models/AccountForDetailed';
 import { Mutation } from '../_models/Mutation';
 import { MutationForDetailed } from '../_models/MutationForDetailed';
 import { MutationForPage } from '../_models/MutationForPage';
+import { MutationForList } from '../_models/MutationForList';
 
 @Injectable()
 export class UserService {
   baseUrl = environment.apiUrl;
 
   constructor(private authHttp: HttpClient) {}
+
+  account: Account;
+
+  setCurrentAccount(account: Account) {
+    this.account = account;
+  }
+  getCurrentAccount() {
+    return this.account;
+  }
 
   getAccounts(userId): Observable<UserWithAccounts> {
     return this.authHttp.get<UserWithAccounts>(this.baseUrl + 'users/' + userId + '/accounts');
@@ -86,9 +96,29 @@ export class UserService {
       mutation);
   }
 
-  getMutations(userId: number, account: Account, page?:  number, itemsPerPage?: number): Observable<MutationForPage> {
+  getMutations(userId: number, accountId: number, page?, itemsPerPage?): Observable<PaginatedResult<MutationForPage>> {
+    const paginatedResult: PaginatedResult<MutationForPage> = new PaginatedResult<MutationForPage>();
+    let params = new HttpParams();
+    if (page != null && itemsPerPage != null) {
+      params = params.append('pageNumber', page);
+      params = params.append('pageSize', itemsPerPage);
+    }
     return this.authHttp.get<MutationForPage>(
-      this.baseUrl + 'users/' + userId + '/accounts/' + account.id + '/mutations');
+      this.baseUrl + 'users/' + userId + '/accounts/' + accountId + '/mutations', {
+        observe: 'response',
+        params: params
+      })
+      .pipe(
+          map((rsp: HttpResponse<MutationForPage>) => {
+            paginatedResult.result = rsp.body;
+            if (rsp.headers.get('Pagination') != null) {
+                paginatedResult.pagination = JSON.parse(
+                rsp.headers.get('Pagination')
+                );
+            }
+            return paginatedResult;
+            })
+        );
   }
   updateUser(id: number, user: User) {
     return this.authHttp.put(this.baseUrl + 'users/' + id, user);
@@ -115,9 +145,7 @@ export class UserService {
   }
 
   getMessages(id: number, page?, itemsPerPage?, messageContainer?: string) {
-    const paginatedResult: PaginatedResult<Message[]> = new PaginatedResult<
-      Message[]
-    >();
+    const paginatedResult: PaginatedResult<Message[]> = new PaginatedResult<Message[]>();
     let params = new HttpParams();
     if (messageContainer) {
       params = params.append('MessageContainer', messageContainer);

@@ -1,0 +1,35 @@
+<div class="container">
+  <p>
+    mutations works for user {{mutations.account.user.knownAs}} on account {{mutations.account.accountname}}
+  </p>
+  <div class="row" *ngIf="mutations.mutations.length > 0">
+    <table class="table table-hover" style="cursor: pointer">
+      <tr>
+        <th style="width: 40%">Mutation</th>
+        <th style="width: 20%">Amount</th>
+        <th style="width: 20%">Balance</th>
+        <th style="width: 20%"></th>
+      </tr>
+      <tr *ngFor="let mutation of mutations.mutations">
+        <td>{{mutation.description}}</td>
+        <td>
+          <div>
+            <strong>{{mutation.amount}}</strong>
+          </div>
+        </td>
+        <td>
+          <div>
+            <strong>{{mutation.balance}}</strong>
+          </div>
+        </td>
+        <td>{{mutation.created | timeAgo}}</td>
+      </tr>
+    </table>
+    <div class="text-center">
+      <pagination [boundaryLinks]="true" [totalItems]="pagination.totalItems" [itemsPerPage]="pagination.itemsPerPage" (pageChanged)="pageChanged($event)"
+        [(ngModel)]="pagination.currentPage" class="pagination-sm" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;"
+        lastText="&raquo;">
+      </pagination>
+    </div>
+  </div>
+</div>

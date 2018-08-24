@@ -26,6 +26,7 @@ export class AccountCardComponent implements OnInit {
   }
   mutationToggle() {
     this.mutationMode = true;
+    this.setCurrentAccount();
   }
 
   cancelMutationMode(mutationMode: boolean) {
@@ -34,5 +35,7 @@ export class AccountCardComponent implements OnInit {
   updateBalance(balance: number) {
     this.account.balance = balance;
   }
-
+  setCurrentAccount() {
+    this.userService.setCurrentAccount(this.account);
+  }
 }

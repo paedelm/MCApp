@@ -2,10 +2,10 @@
   <div *ngIf="!mutationMode" class="card-img-wrapper">
     <img class="card-img-top" src="{{'../../../assets/user.png'}}" alt="{{account.accountname}}">
     <ul class="list-inline member-icons animate text-center">
-      <li class="list-inline-item"><button class="btn btn-primary"
-          [routerLink]="['/accounts/']"><i class="fa fa-credit-card"></i></button></li>
+      <li class="list-inline-item"><button class="btn btn-primary"  (click)="setCurrentAccount()"
+          [routerLink]="['/mutations/']"><i class="fa fa-credit-card"></i></button></li>
       <li class="list-inline-item"><button class="btn btn-primary" (click)="mutationToggle()"><i class="fa fa-credit-card"></i></button></li>
-      <li class="list-inline-item"><button class="btn btn-primary" [routerLink]="['/members/', 2]" [queryParams]="{tab: 3}" ><i class="fa fa-envelope"></i></button></li>
+      <!-- <li class="list-inline-item"><button class="btn btn-primary" [routerLink]="['/members/', 2]" [queryParams]="{tab: 3}" ><i class="fa fa-envelope"></i></button></li> -->
     </ul>
   </div>
   <div *ngIf="mutationMode" class="card-img-wrapper">

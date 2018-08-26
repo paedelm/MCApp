@@ -94,7 +94,15 @@ namespace MCApp.API.Data
             var mutations = _context.Mutations
                 .Where(m => m.UserId == mutationParams.UserId && m.AccountId == mutationParams.AccountId)
                 .AsQueryable();
-
+            if (mutationParams.MinAmount != MutationParams.cMinAmount || mutationParams.MaxAmount != MutationParams.cMaxAmount) {
+                mutations = mutations.Where(m => (m.Amount >= mutationParams.MinAmount) && (m.Amount <= mutationParams.MaxAmount) );
+            }
+            if (!(mutationParams.MinDate == null || mutationParams.MinDate.CompareTo(DateTime.MinValue) == 0)) {
+                mutations = mutations.Where(m => m.Created >= mutationParams.MinDate);
+            }
+            if (!(mutationParams.MaxDate == null || mutationParams.MaxDate.CompareTo(DateTime.MinValue) == 0)) {
+                mutations = mutations.Where(m => m.Created <= mutationParams.MaxDate);
+            }
             var omutations = mutations.OrderByDescending(m => m.Id);
             return await PagedList<Mutation>.CreateAsync(omutations, mutationParams.PageNumber, mutationParams.PageSize);
         }

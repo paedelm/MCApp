@@ -1,7 +1,41 @@
 <div class="container">
-  <p>
-    mutations works for user {{mutations.account.user.knownAs}} on account {{mutations.account.accountname}}
-  </p>
+
+  <div class="row">
+    <div class="text-center">
+      <h2 class="text-center">
+        Mutations on {{mutations.account.accountname}} for {{mutations.account.user.knownAs}} ({{pagination.currentPage}}/{{pagination.totalPages}})
+      </h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <form class="form-inline" #form="ngForm" (ngSubmit)="loadMutations()" novalidate>
+      <div class="form-group">
+        <label for="minDate">Date From </label>
+        <input class="form-control" type="text" bsDatepicker [bsConfig]="bsConfig" placeholder="start Date" style="width: 110px" id="minDate" name="minDate" [(ngModel)]="qryParams.minDate">
+      </div>
+
+      <div class="form-group">
+        <label for="maxDate"> Date To </label>
+        <input class="form-control" type="text" bsDatepicker [bsConfig]="bsConfig" placeholder="end Date" style="width: 110px" id="maxDate" name="maxDate" [(ngModel)]="qryParams.maxDate">
+      </div>
+
+      <div class="form-group">
+        <label for="minAmount"> Amount From </label>
+        <input type="number" class="form-control" style="width: 90px" id="minAmount" name="minAmount" [(ngModel)]="qryParams.minAmount">
+      </div>
+
+      <div class="form-group">
+        <label for="maxAmount"> Amount To </label>
+        <input type="number" class="form-control" style="width: 90px" id="maxAmount" name="maxAmount" [(ngModel)]="qryParams.maxAmount">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="margin-left:10px">Apply Filters</button>
+      <button type="button" class="btn btn-info" style="margin-left:10px" (click)="resetFilters()">Reset Filter</button>
+    </form>
+  </div>
+  <br>
+
   <div class="row" *ngIf="mutations.mutations.length > 0">
     <table class="table table-hover" style="cursor: pointer">
       <tr>

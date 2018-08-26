@@ -14,6 +14,7 @@ import { Mutation } from '../_models/Mutation';
 import { MutationForDetailed } from '../_models/MutationForDetailed';
 import { MutationForPage } from '../_models/MutationForPage';
 import { MutationForList } from '../_models/MutationForList';
+import { MutationParams } from '../_models/MutationParams';
 
 @Injectable()
 export class UserService {
@@ -96,12 +97,19 @@ export class UserService {
       mutation);
   }
 
-  getMutations(userId: number, accountId: number, page?, itemsPerPage?): Observable<PaginatedResult<MutationForPage>> {
+  getMutations(userId: number, accountId: number,
+     page?, itemsPerPage?, qryParams?: MutationParams): Observable<PaginatedResult<MutationForPage>> {
     const paginatedResult: PaginatedResult<MutationForPage> = new PaginatedResult<MutationForPage>();
     let params = new HttpParams();
     if (page != null && itemsPerPage != null) {
       params = params.append('pageNumber', page);
       params = params.append('pageSize', itemsPerPage);
+    }
+    if (qryParams != null) {
+      if (qryParams.minDate) { params = params.append('minDate', qryParams.minDate.toDateString()); }
+      if (qryParams.maxDate) { params = params.append('maxDate', qryParams.maxDate.toDateString()); }
+      if (qryParams.minAmount) { params = params.append('minAmount', qryParams.minAmount.toString()); }
+      if (qryParams.maxAmount) { params = params.append('maxAmount', qryParams.maxAmount.toString()); }
     }
     return this.authHttp.get<MutationForPage>(
       this.baseUrl + 'users/' + userId + '/accounts/' + accountId + '/mutations', {

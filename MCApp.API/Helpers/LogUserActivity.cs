@@ -16,8 +16,11 @@ namespace MCApp.API.Helpers
             var userid = int.Parse(s: resultContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             var repo = resultContext.HttpContext.RequestServices.GetService<IMicroCreditRepository>();
             User user = await repo.GetUser(userid);
-            user.LastActive = DateTime.Now;
-            await repo.SaveAll();
+            if (user != null)
+            {
+                user.LastActive = DateTime.Now;
+                await repo.SaveAll();
+            }
         }
     }
 }

@@ -7,6 +7,8 @@ import { ActivatedRoute, Router } from '../../../node_modules/@angular/router';
 import { AlertifyService } from '../_services/alertify.service';
 import { Account } from '../_models/Account';
 import { UserService } from '../_services/user.service';
+import { BsDatepickerConfig } from 'ngx-bootstrap';
+import { MutationParams } from '../_models/MutationParams';
 
 @Component({
   selector: 'app-mutations',
@@ -18,8 +20,11 @@ export class MutationsComponent implements OnInit {
   pagination: Pagination;
   user: UserWithAccounts;
   account: Account;
+  qryParams: MutationParams = {};
+  bsConfig: Partial<BsDatepickerConfig>;
+
   constructor(private authService: AuthService, private userService: UserService,
-     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) { }
+     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -38,7 +43,7 @@ export class MutationsComponent implements OnInit {
   loadMutations() {
     this.userService
       .getMutations(this.authService.decodedToken.nameid, this.mutations.account.id,
-        this.pagination.currentPage, this.pagination.itemsPerPage)
+        this.pagination.currentPage, this.pagination.itemsPerPage, this.qryParams)
         .subscribe((res: PaginatedResult<MutationForPage>) => {
           this.mutations = res.result;
           this.pagination = res.pagination;
@@ -47,16 +52,12 @@ export class MutationsComponent implements OnInit {
         }
       );
   }
-/*
-        return this.userService.getMutations(this.authService.decodedToken.nameid,
-            this.userService.getCurrentAccount(),
-            this.pageNumber, this.pageSize)
-        .pipe(
-            catchError(error => {
-            this.alertify.error('Problem retrieving data');
-            this.router.navigate(['/home']);
-            return of(null);
-            })
-        );
-*/
+  private defaultFilters() {
+    this.qryParams = {};
+  }
+
+  resetFilters() {
+    this.defaultFilters();
+    this.loadMutations();
+  }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -9,9 +10,15 @@ import { AuthService } from '../_services/auth.service';
 export class HomeComponent implements OnInit {
   registerMode = false;
   values: any;
-  constructor(public authService: AuthService) { }
+  constructor(public authService: AuthService, private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const newAccount = params['newaccount'];
+      if (newAccount) {
+        this.registerToggle();
+      }
+    });
   }
 
 

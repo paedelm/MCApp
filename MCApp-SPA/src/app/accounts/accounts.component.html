@@ -1,6 +1,7 @@
 <br>
 <div class="text-right">
-  <button class="btn btn-primary btn-lg mr-2" (click)="newAccount(user.id)">New Account</button>
+  <!-- <button class="btn btn-primary btn-lg mr-2" (click)="newAccount(user.id)">New Account</button> -->
+  <button class="btn btn-primary btn-lg mr-2" [routerLink]="['/home']" [queryParams]="{newaccount: 'true'}" routerLinkActive="router-link-active">New Account</button>
 </div>
 <br>
 <div class="row equal">

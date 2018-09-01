@@ -53,7 +53,7 @@ export class AuthService {
     }
   }
 
-  login(model: any) {
+  login(model: any): Observable<AuthUser> {
     return this.http
       .post<AuthUser>(this.baseUrl + 'login', model, {
         headers: new HttpHeaders().set('Content-Type', 'application/json')
@@ -71,6 +71,7 @@ export class AuthService {
             this.currentUser.fromCache = true;
             this.changeMemberPhoto(this.currentUser.photoUrl, '../');
             console.log(this.decodedToken);
+            return user;
           }
         })
       );

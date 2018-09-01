@@ -14,6 +14,7 @@ namespace MCApp.API.Helpers
                 .ForMember(dest => dest.Age, opt => opt.ResolveUsing(src => src.DateOfBirth.CalculateAge()));
             CreateMap<User, UserForListDto>()
                 .ForMember(dest => dest.Age, opt => opt.ResolveUsing(src => src.DateOfBirth.CalculateAge()));
+            CreateMap<UserForUpdateDto, User>();
             
             CreateMap<Account, AccountForListDto>();
             CreateMap<Account, AccountForDetailedDto>();

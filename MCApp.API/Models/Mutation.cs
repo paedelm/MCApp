@@ -10,6 +10,7 @@ namespace MCApp.API.Models
         public DateTime InterestDate { get; set; }
         public double Amount { get; set; }
         public double Balance { get; set; }
+        public double Percentage { get; set; }
         public Account Account { get; set; }
         public string Description { get; set; }
         public int AccountId { get; set; } 

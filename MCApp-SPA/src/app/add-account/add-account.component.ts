@@ -40,7 +40,7 @@ export class AddAccountComponent implements OnInit {
     this.addAccountForm = this.fb.group({
       accountname: ['', Validators.required],
       description: ['', Validators.required],
-      percentage: [0.0, Validators.required],
+      percentage: ['', Validators.required],
     }, {validator: this.formValidator});
   }
 

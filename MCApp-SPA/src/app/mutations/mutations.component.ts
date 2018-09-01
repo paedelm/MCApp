@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, LOCALE_ID } from '@angular/core';
 import { MutationForPage } from '../_models/MutationForPage';
 import { Pagination, PaginatedResult } from '../_models/Pagination';
 import { UserWithAccounts } from '../_models/UserWithAccounts';
@@ -22,9 +22,13 @@ export class MutationsComponent implements OnInit {
   account: Account;
   qryParams: MutationParams = {};
   bsConfig: Partial<BsDatepickerConfig>;
+  locale: string;
 
-  constructor(private authService: AuthService, private userService: UserService,
-     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) {}
+  constructor(@Inject (LOCALE_ID) locale: string,
+    private authService: AuthService, private userService: UserService,
+     private alertify: AlertifyService, private route: ActivatedRoute, private router: Router) {
+       this.locale = locale;
+     }
 
   ngOnInit() {
     this.route.data.subscribe(data => {

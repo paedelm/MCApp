@@ -39,21 +39,21 @@
   <div class="row" *ngIf="mutations.mutations.length > 0">
     <table class="table table-hover" style="cursor: pointer">
       <tr>
-        <th style="width: 40%">Mutation</th>
-        <th style="width: 20%">Amount</th>
-        <th style="width: 20%">Balance</th>
-        <th style="width: 20%"></th>
+        <th style="width: 30%">Mutation</th>
+        <th style="width: 22%" style="text-align: right">Amount</th>
+        <th style="width: 22%" style="text-align: right">Balance</th>
+        <th style="width: 26%"></th>
       </tr>
       <tr *ngFor="let mutation of mutations.mutations">
         <td>{{mutation.description}}</td>
-        <td>
+        <td align="right">
           <div>
-            <strong>{{mutation.amount}}</strong>
+            <strong>{{mutation.amount | currency: 'EUR' : '': '': 'nl-NL'}} </strong>
           </div>
         </td>
-        <td>
+        <td  align="right">
           <div>
-            <strong>{{mutation.balance}}</strong>
+            <strong>{{mutation.balance | currency: 'EUR' : '': '': 'nl-NL'}}</strong>
           </div>
         </td>
         <td>{{mutation.created | timeAgo}}</td>

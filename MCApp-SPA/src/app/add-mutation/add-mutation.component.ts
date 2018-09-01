@@ -43,7 +43,7 @@ export class AddMutationComponent implements OnInit {
   createAddMutationForm() {
     this.addMutationForm = this.fb.group({
       description: ['', Validators.required],
-      amount: [0.0, Validators.required],
+      amount: ['', Validators.required],
     }, {validator: this.formValidator});
   }
 

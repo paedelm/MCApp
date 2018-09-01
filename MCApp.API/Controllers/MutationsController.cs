@@ -59,7 +59,12 @@ namespace MCApp.API.Controllers
                 }
                 // zoek eerst nog de gemiddelde rente op dus alle percentages af totdat 
                 var interest = (nrdays / 365) * account.Percentage;
-                account.CalculatedInterest += interest; 
+                account.CalculatedInterest += interest;
+            }
+            if (mutation.Percentage != 0.0) {
+                account.Percentage = mutation.Percentage;
+            } else {
+                mutation.Percentage = account.Percentage;
             }
             account.Balance = mutation.Balance;
             account.LastMutationCreated = mutation.Created;

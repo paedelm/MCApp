@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -43,6 +44,26 @@ namespace MCApp.API.Controllers
 
             var userToReturn = _map.Map<UserForDetailedDto>(user);
             return Ok(userToReturn);
+        }
+        // api/users/1 Put
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserForUpdateDto userForUpdateDto) {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (currentUserId != id) return Unauthorized();
+
+            var userFromRepo = await _repo.GetUser(id);
+
+            if (userFromRepo == null) return NotFound($"Could not find user with id of {id}");
+
+            _map.Map(userForUpdateDto, userFromRepo);
+
+            if (await _repo.SaveAll()) return NoContent();
+
+            throw new Exception($"Updating user {id} failed on save");
+
         }
      }
 }

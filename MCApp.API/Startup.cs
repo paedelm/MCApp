@@ -4,8 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using MCApp.API.BackgroundServices;
 using MCApp.API.Data;
 using MCApp.API.Helpers;
+using MCApp.API.ScheduledServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -17,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -71,10 +74,13 @@ namespace MCApp.API
                     };
                 });
             services.AddScoped<LogUserActivity>();
+            // services.AddSingleton<IHostedService, Poller>();
+            ScheduleTable.AddScheduledServices(services);
+            Console.WriteLine($"Poller ProcessName = {ScheduleTable.GetScheduleForProcess<PollerProcess, int>().ProcessName}");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {

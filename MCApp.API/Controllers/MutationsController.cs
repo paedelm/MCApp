@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using MCApp.API.BackgroundServices;
 using MCApp.API.Data;
 using MCApp.API.Dtos;
 using MCApp.API.Helpers;
 using MCApp.API.Models;
+using MCApp.API.ScheduledServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,11 +22,13 @@ namespace MCApp.API.Controllers
     {
         private readonly IMicroCreditRepository _repo;
         private readonly IMapper _map;
+        private  ScheduleTable schedulePollerProcess;
 
         public MutationsController(IMicroCreditRepository repo, IMapper map)
         {
             _repo = repo;
             _map = map;
+            schedulePollerProcess = ScheduleTable.GetScheduleForProcess<PollerProcess, int>();
         }
 
         [HttpPost]
@@ -73,6 +77,7 @@ namespace MCApp.API.Controllers
             _repo.Add(mutation);
             if (await _repo.SaveAll()) {
                 var mutationToReturn = _map.Map<MutationForDetailedDto>(mutation);
+                ScheduleTable.StartProcess(schedulePollerProcess, 5000);
                 return CreatedAtRoute("GetMutation", new { id = mutation.Id }, mutationToReturn);
             }
             throw new Exception("Creating the mutation failed on save");

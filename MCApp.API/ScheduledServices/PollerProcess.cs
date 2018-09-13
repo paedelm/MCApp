@@ -1,33 +1,36 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using MCApp.API.Data;
 using MCApp.API.Helpers;
 using MCApp.API.Models;
+using MCApp.API.TypedHttpClients;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace MCApp.API.BackgroundServices
+namespace MCApp.API.ScheduledServices
 {
-    public class PollerProcess : IProcess<int>
+    public class PollerProcess : TemplateProcess
     {
         private readonly ILogger<PollerProcess> _logger;
         private readonly IMicroCreditRepository _repo;
+        private readonly MCApiClient _mcApi;
 
-        public PollerProcess(ILogger<PollerProcess> logger, IMicroCreditRepository repo)
+        public PollerProcess(ILogger<PollerProcess> logger, IMicroCreditRepository repo, MCApiClient mcApi)
         {
             _logger = logger;
             _repo = repo;
+            _mcApi = mcApi;
         }
-        public async Task ProcessAsync() {
-            await ProcessAsync(5000);
-        }
-        public async Task ProcessAsync(int delay)
+        public async override Task ProcessAsync(int dummy)
         {
+            // _mcApi.Client.GetAsync()
             var user = await _repo.GetUser("paedelm");
             Console.WriteLine($"userid: {user.Id} knownAs:{user.KnownAs} lastactive:{user.LastActive}");
             PagedList<Mutation> pg = await _repo.GetMutationsForUserAccount(new Helpers.MutationParams { UserId = 1, AccountId = 1, PageNumber = 1, PageSize = 20 });
             Console.WriteLine($"PageSize={pg.PageSize} en Count={pg.Count}");
+            Console.WriteLine($"version={GetType().GetTypeInfo().Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version}");
             foreach (var mut in pg)
             {
                 Console.WriteLine($"{mut.Account.Accountname} - {mut.Amount} - {mut.Balance} - {mut.Created}");
@@ -41,7 +44,7 @@ namespace MCApp.API.BackgroundServices
             await Task.Run(() =>
             {
                 //    logger.LogInformation("In de poller Process procedure"));
-                Console.WriteLine($"In de poller Process procedure {delay}");
+                Console.WriteLine($"In de poller Process procedure");
             });
         }
 

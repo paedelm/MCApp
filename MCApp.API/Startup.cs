@@ -8,10 +8,12 @@ using MCApp.API.BackgroundServices;
 using MCApp.API.Data;
 using MCApp.API.Helpers;
 using MCApp.API.ScheduledServices;
+using MCApp.API.TypedHttpClients;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -75,8 +77,9 @@ namespace MCApp.API
                 });
             services.AddScoped<LogUserActivity>();
             // services.AddSingleton<IHostedService, Poller>();
+            ScheduleTable.AddScopedServices(services);
+            TemplateHttpClient.AddServices(services);
             ScheduleTable.AddScheduledServices(services);
-            Console.WriteLine($"Poller ProcessName = {ScheduleTable.GetScheduleForProcess<PollerProcess, int>().ProcessName}");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -101,6 +104,11 @@ namespace MCApp.API
                         }
                     });
                 });
+            }
+            var urls = app.ServerFeatures.Get<IServerAddressesFeature>().Addresses;
+            Console.WriteLine($"aantal urls={urls.Count}");
+            foreach (var url in urls) {
+                Console.WriteLine($"url={url}");
             }
 
             // seeder.SeedUsers();

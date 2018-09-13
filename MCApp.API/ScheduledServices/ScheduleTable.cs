@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MCApp.API.ScheduledServices
 {
-    public class ScheduleTable
+    public partial class ScheduleTable
     {
         public Type ProcessType { get; set; }
         public  string ProcessName  { get; set; }
@@ -16,27 +16,27 @@ namespace MCApp.API.ScheduledServices
         public int index { get; set;}
         public Object CmdQue { get; set; }
         public ProcessIteration Iteration { get; set; }
-        // Voor iedere Process een nieuwe ScheduleTable opnemen
+        // Voor iedere Process een nieuwe ScheduleTable opnemen zie ScheduleTableServices.cs
         // Create<TProcess, TProcessParam>()
-        public enum ProcessIteration { OnDemand, Schedule, Repeating};
+        public enum ProcessIteration { OnDemand, CustomSchedule, Repeating};
 
-        public static ScheduleTable[] scheduleTable =  {
-                Create<PollerProcess, int>(schedule: "schedule", delay: 15000, singleInstance: false, iteration: ProcessIteration.OnDemand)
-        };
-        // Ieder poller<Process> toevoegen als AddHostedService
-        // Ieder Process toevoegen als ScopedService
-        public static void AddScheduledServices(IServiceCollection services) {
-            // Dit eerst doen met een foreach 
+        public static void AddScopedServices(IServiceCollection services) {
+            // dit wordt als eerste uitgevoerd vanuit startup.cs
+            // geen handmatige actie 
             foreach (var entry in scheduleTable) {
                 services.AddScoped(entry.ProcessType);
             }
-            // handmatige actie:
-            // Per Process een entry opnemen.
-            AddScheduledService<PollerProcess, int>(services);
-
+        }
+        public static void AddScheduledService<TProcess>(IServiceCollection services) where TProcess: IProcess<int> {
+            AddScheduledService<TProcess, int>(services);
         }
         public static void AddScheduledService<TProcess, TProcessParam>(IServiceCollection services) where TProcess: IProcess<TProcessParam> {
             services.AddHostedService<Poller<TProcess, TProcessParam>>();
+            var schedule = ScheduleTable.GetScheduleForProcess<TProcess, TProcessParam>();
+            Console.WriteLine($"Registered {schedule.Iteration} Process: {schedule.ProcessName}");
+        }
+        public static ScheduleTable GetScheduleForProcess<TProcess>() where TProcess: IProcess<int> {
+            return GetScheduleForProcess<TProcess, int>();
         }
         public static ScheduleTable GetScheduleForProcess<TProcess, TProcessParam>() where TProcess: IProcess<TProcessParam> {
             var processName = typeof(TProcess).Name;
@@ -47,6 +47,18 @@ namespace MCApp.API.ScheduledServices
             }
             return null;
         }
+        public static ScheduleTable Create<TProcess>(
+            string schedule,
+            bool singleInstance,
+            int delay,
+            ProcessIteration iteration) where TProcess: IProcess<int> {
+                return Create<TProcess, int>(
+                    schedule: schedule,
+                    delay: delay,
+                    singleInstance: singleInstance,
+                    iteration: iteration
+                );
+            }
         public static ScheduleTable Create<TProcess, TProcessParam>(
             string schedule,
             bool singleInstance,

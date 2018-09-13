@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using MCApp.API.ScheduledServices;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MCApp.API.BackgroundServices
@@ -13,24 +14,23 @@ namespace MCApp.API.BackgroundServices
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        protected override async Task ProcessAsync(TProcessParam param) {
+        public override async Task ProcessAsync(TProcessParam param) {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                Console.WriteLine("in ScopedProcessor.ProcessAsync with param");
+                Console.WriteLine("in ScopedProcessor.ProcessAsync");
                 await ProcessInScope(scope.ServiceProvider, param);
             }
 
         }
-        protected override async Task ProcessAsync()
-        {
+        public override bool CalculateDelay(out int delay, ScheduleTable schedule, int iteration) {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                Console.WriteLine("in ScopedProcessor.ProcessAsync");
-                await ProcessInScope(scope.ServiceProvider);
+                Console.WriteLine("in ScopedProcessor.CalculateDelay");
+                return CalculateDelayInScope(scope.ServiceProvider, out delay, schedule, iteration);
             }
         }
 
-        protected abstract Task ProcessInScope(IServiceProvider serviceProvider);
         protected abstract Task ProcessInScope(IServiceProvider serviceProvider, TProcessParam param);
+        protected abstract bool CalculateDelayInScope(IServiceProvider serviceProvider, out int delay, ScheduleTable schedule, int iteration);
     }
 }

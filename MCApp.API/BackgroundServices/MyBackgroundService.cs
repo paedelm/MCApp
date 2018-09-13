@@ -7,104 +7,102 @@ using Microsoft.Extensions.Hosting;
 
 namespace MCApp.API.BackgroundServices
 {
-    public abstract class MyBackgroundService : MyBackgroundService<int> { }
-    public abstract class MyBackgroundService<TProcessParam> : BackgroundService
+    public abstract class MyBackgroundService : MyBackgroundService<int>
     {
-        private Task _executingTask;
-        private readonly CancellationTokenSource _stoppingCts =
-                                                       new CancellationTokenSource();
-        protected int delay = 950000;
+        public MyBackgroundService()
+        {
+            defValue = 1;
+        }
+    }
+    public abstract class MyBackgroundService<TProcessParam> : BackgroundService, IPollerProcess<TProcessParam>
+    {
+        protected TProcessParam defValue;
         public ScheduleTable schedule;
         public BlockingCollection<TProcessParam> cmdQ;
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            // Store the task we're executing
-            _executingTask = ExecuteAsync(_stoppingCts.Token);
-
-            // If the task is completed then return it,
-            // this will bubble cancellation and failure to the caller
-            if (_executingTask.IsCompleted)
-            {
-                return _executingTask;
-            }
-
-            // Otherwise it's running
-            return Task.CompletedTask;
+            return ExecuteAsync(cancellationToken);
         }
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            // Stop called without start
-            if (_executingTask == null)
-            {
-                return;
-            }
-
-            try
-            {
-                // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
-            }
-            finally
-            {
-                // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite,
-                                                          cancellationToken));
-            }
-        }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //stoppingToken.Register(() =>
-            //        _logger.LogDebug($" GracePeriod background task is stopping."));
+            TProcessParam param;
             switch (schedule.Iteration)
             {
                 case ScheduleTable.ProcessIteration.Repeating:
-                    do
+                    try
                     {
-                        TProcessParam tdelay;
-                        await ProcessAsync();
-                        if (cmdQ.TryTake(out tdelay, schedule.Delay, stoppingToken))
+                        do
                         {
-                            Console.WriteLine($"gelukte TryTake tdelay={tdelay}");
-                        }
+                            await ProcessAsync(defValue);
+                            if (cmdQ.TryTake(item: out param, millisecondsTimeout: schedule.Delay, cancellationToken: stoppingToken))
+                            {
+                                Console.WriteLine($"gelukte TryTake param={param}");
+                            }
 
+                        }
+                        while (!stoppingToken.IsCancellationRequested);
                     }
-                    while (!stoppingToken.IsCancellationRequested);
+                    catch (OperationCanceledException)
+                    {
+                        Console.WriteLine($"Process {schedule.ProcessName} OperationCanceledException");
+                    }
                     break;
 
                 case ScheduleTable.ProcessIteration.OnDemand:
-                    do
+                    try
                     {
-                        TProcessParam param;
-                        if (cmdQ.TryTake(out param, schedule.Delay, stoppingToken))
+                        do
                         {
-                            Console.WriteLine($"gelukte TryTake param={param}");
-                            await ProcessAsync(param);
-                        }
+                            if (cmdQ.TryTake(item: out param, millisecondsTimeout: -1, cancellationToken: stoppingToken))
+                            {
+                                Console.WriteLine($"gelukte TryTake param={param}");
+                                await ProcessAsync(param);
+                            }
 
+                        }
+                        while (!stoppingToken.IsCancellationRequested);
                     }
-                    while (!stoppingToken.IsCancellationRequested);
-                    break;
-                case ScheduleTable.ProcessIteration.Schedule:
-                    // nog echt implementeren
-                    do
+                    catch (OperationCanceledException)
                     {
-                        TProcessParam param;
-                        if (cmdQ.TryTake(out param, schedule.Delay, stoppingToken))
-                        {
-                            Console.WriteLine($"gelukte TryTake param={param}");
-                            await ProcessAsync(param);
-                        }
-
+                        Console.WriteLine($"Process {schedule.ProcessName} OperationCanceledException");
                     }
-                    while (!stoppingToken.IsCancellationRequested);
                     break;
-                default:
+                case ScheduleTable.ProcessIteration.CustomSchedule:
+                    // Custom betekent vragen om de delay en of er uitgevoerd moet worden na timeout
+                    // let op: bij trytake succes wordt er wel uitgevoerd.
+                    // Crontab kan via CalculateDelay worden geimplementeerd
+                    int iteration = 0;
+                    try
+                    {
+                        do
+                        {
+                            int delay;
+                            bool xqtAfterTimeout = CalculateDelay(out delay, schedule, iteration);
+                            Console.WriteLine($"xqtAfterTimeout, delay={xqtAfterTimeout},{delay}");
+                            if (cmdQ.TryTake(item: out param, millisecondsTimeout: delay, cancellationToken: stoppingToken))
+                            {
+                                Console.WriteLine($"gelukte TryTake param={param}");
+                                await ProcessAsync(param);
+                            }
+                            else if (xqtAfterTimeout)
+                            {
+                                Console.WriteLine($"Execute because of Custom procedure");
+                                await ProcessAsync(param);
+                            }
+                            iteration++;
+                        }
+                        while (!stoppingToken.IsCancellationRequested);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Console.WriteLine($"Process {schedule.ProcessName} OperationCanceledException");
+                    }
                     break;
             }
+            Console.WriteLine($"Process {schedule.ProcessName} stopped");
         }
 
-        protected virtual Task ProcessAsync(TProcessParam param) { return Task.CompletedTask; }
-        protected virtual Task ProcessAsync() { return Task.CompletedTask; }
+        public abstract Task ProcessAsync(TProcessParam param);
+        public abstract bool CalculateDelay(out int delay, ScheduleTable schedule, int iteration);
     }
 }

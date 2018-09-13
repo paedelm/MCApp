@@ -3,9 +3,10 @@ using MCApp.API.ScheduledServices;
 
 namespace MCApp.API.BackgroundServices
 {
-    public interface IProcess<TProcessParam>
+    public interface IPollerProcess<TProcessParam>
     {
         Task ProcessAsync(TProcessParam param);
-        bool CalculateDelay(out int delay, ScheduleTable schedule, int iteration);
+        bool CalculateDelay(out int delay, ScheduleTable schedule, int iteration );
+         
     }
 }

@@ -28,7 +28,7 @@ namespace MCApp.API.Controllers
         {
             _repo = repo;
             _map = map;
-            schedulePollerProcess = ScheduleTable.GetScheduleForProcess<PollerProcess, int>();
+            schedulePollerProcess = ScheduleTable.GetScheduleForProcess<PollerProcess>();
         }
 
         [HttpPost]

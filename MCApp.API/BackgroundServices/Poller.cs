@@ -21,6 +21,19 @@ namespace MCApp.API.BackgroundServices
             schedule = ScheduleTable.GetScheduleForProcess<TProcess, TProcessParam>();
             cmdQ = (BlockingCollection<TProcessParam>)schedule.CmdQue;
         }
+        protected override bool CalculateDelayInScope(IServiceProvider serviceProvider, out int delay, ScheduleTable schedule, int iteration ) {
+                var scopedProcessor = serviceProvider.GetService<TProcess>();
+                    try
+                    {
+                        return scopedProcessor.CalculateDelay(out delay, schedule, iteration);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    delay = schedule.Delay;
+                    return false;
+        }
 
         protected override async Task ProcessInScope(IServiceProvider serviceProvider, TProcessParam param)
         {
@@ -46,35 +59,5 @@ namespace MCApp.API.BackgroundServices
             });
         }
 
-        protected override async Task ProcessInScope(IServiceProvider serviceProvider)
-        {
-            await Task.Run(async () =>
-            {
-                Console.WriteLine("in Poller.ProcessInScope 1");
-                var scopedProcessor = serviceProvider.GetService<TProcess>();
-                if (scopedProcessor == null)
-                {
-                    Console.WriteLine($"{typeof(TProcess).Name} is null");
-                }
-                else
-                {
-                    try
-                    {
-                        await scopedProcessor.ProcessAsync();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-                }
-            });
-
-            // var scopedProcessor = serviceProvider.GetService<PollerProcess>();
-            // var logger = serviceProvider.GetService<ILogger>();
-            // logger.LogInformation("voor nummer 2");
-            //Console.WriteLine("in Poller.ProcessInScope 2");
-            // await scopedProcessor.ProcessAsync(logger);
-            // Console.WriteLine("in Poller.ProcessInScope 3");
-        }
     }
 }

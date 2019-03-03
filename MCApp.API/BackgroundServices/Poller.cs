@@ -35,8 +35,9 @@ namespace MCApp.API.BackgroundServices
                     return false;
         }
 
-        protected override async Task ProcessInScope(IServiceProvider serviceProvider, TProcessParam param)
+        protected override async Task<bool> ProcessInScope(IServiceProvider serviceProvider, TProcessParam param, CancellationToken stoppingToken )
         {
+            bool isFinished = true;
             await Task.Run(async () =>
             {
                 Console.WriteLine("in Poller.ProcessInScope 1");
@@ -49,7 +50,7 @@ namespace MCApp.API.BackgroundServices
                 {
                     try
                     {
-                        await scopedProcessor.ProcessAsync(param);
+                        isFinished = await scopedProcessor.ProcessAsync(param, stoppingToken);
                     }
                     catch (Exception e)
                     {
@@ -57,6 +58,7 @@ namespace MCApp.API.BackgroundServices
                     }
                 }
             });
+            return isFinished;
         }
 
     }

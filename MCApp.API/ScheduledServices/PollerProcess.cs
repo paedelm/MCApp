@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using MCApp.API.Data;
 using MCApp.API.Helpers;
@@ -23,7 +24,7 @@ namespace MCApp.API.ScheduledServices
             _repo = repo;
             _mcApi = mcApi;
         }
-        public async override Task ProcessAsync(int dummy)
+        public async override Task<bool> ProcessAsync(int dummy, CancellationToken stoppingToken)
         {
             // _mcApi.Client.GetAsync()
             var user = await _repo.GetUser("paedelm");
@@ -46,6 +47,8 @@ namespace MCApp.API.ScheduledServices
                 //    logger.LogInformation("In de poller Process procedure"));
                 Console.WriteLine($"In de poller Process procedure");
             });
+            // geef aan dat je klaar bent
+            return true;
         }
 
     }

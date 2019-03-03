@@ -14,7 +14,7 @@ namespace MCApp.API.BackgroundServices
             defValue = 1;
         }
     }
-    public abstract class MyBackgroundService<TProcessParam> : BackgroundService, IPollerProcess<TProcessParam>
+    public abstract class MyBackgroundService<TProcessParam> : BackgroundService, IProcess<TProcessParam>
     {
         protected TProcessParam defValue;
         public ScheduleTable schedule;
@@ -33,7 +33,7 @@ namespace MCApp.API.BackgroundServices
                     {
                         do
                         {
-                            await ProcessAsync(defValue);
+                            await ProcessAsync(defValue, stoppingToken);
                             if (cmdQ.TryTake(item: out param, millisecondsTimeout: schedule.Delay, cancellationToken: stoppingToken))
                             {
                                 Console.WriteLine($"gelukte TryTake param={param}");
@@ -56,7 +56,7 @@ namespace MCApp.API.BackgroundServices
                             if (cmdQ.TryTake(item: out param, millisecondsTimeout: -1, cancellationToken: stoppingToken))
                             {
                                 Console.WriteLine($"gelukte TryTake param={param}");
-                                await ProcessAsync(param);
+                                await ProcessAsync(param, stoppingToken);
                             }
 
                         }
@@ -82,12 +82,12 @@ namespace MCApp.API.BackgroundServices
                             if (cmdQ.TryTake(item: out param, millisecondsTimeout: delay, cancellationToken: stoppingToken))
                             {
                                 Console.WriteLine($"gelukte TryTake param={param}");
-                                await ProcessAsync(param);
+                                await ProcessAsync(param, stoppingToken);
                             }
                             else if (xqtAfterTimeout)
                             {
                                 Console.WriteLine($"Execute because of Custom procedure");
-                                await ProcessAsync(param);
+                                await ProcessAsync(param, stoppingToken);
                             }
                             iteration++;
                         }
@@ -102,7 +102,7 @@ namespace MCApp.API.BackgroundServices
             Console.WriteLine($"Process {schedule.ProcessName} stopped");
         }
 
-        public abstract Task ProcessAsync(TProcessParam param);
+        public abstract Task<bool> ProcessAsync(TProcessParam param, CancellationToken stoppingToken);
         public abstract bool CalculateDelay(out int delay, ScheduleTable schedule, int iteration);
     }
 }

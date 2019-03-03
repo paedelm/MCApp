@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MCApp.API.ScheduledServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,11 +15,15 @@ namespace MCApp.API.BackgroundServices
             _serviceScopeFactory = serviceScopeFactory;
         }
 
-        public override async Task ProcessAsync(TProcessParam param) {
+        public override async Task<bool> ProcessAsync(TProcessParam param, CancellationToken stoppingToken) {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 Console.WriteLine("in ScopedProcessor.ProcessAsync");
-                await ProcessInScope(scope.ServiceProvider, param);
+                bool isFinished;
+                do {
+                    isFinished = await ProcessInScope(scope.ServiceProvider, param, stoppingToken);
+                } while (!isFinished && !stoppingToken.IsCancellationRequested);
+                return true;
             }
 
         }
@@ -30,7 +35,7 @@ namespace MCApp.API.BackgroundServices
             }
         }
 
-        protected abstract Task ProcessInScope(IServiceProvider serviceProvider, TProcessParam param);
+        protected abstract Task<bool> ProcessInScope(IServiceProvider serviceProvider, TProcessParam param, CancellationToken stoppingToken);
         protected abstract bool CalculateDelayInScope(IServiceProvider serviceProvider, out int delay, ScheduleTable schedule, int iteration);
     }
 }
